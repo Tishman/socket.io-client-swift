@@ -26,6 +26,13 @@ import Foundation
 
 /// A wrapper around a handler.
 public struct SocketEventHandler {
+    // MARK: Init
+    public init(event: String, id: UUID, callback: NormalCallback) {
+        self.event = event
+        self.id = id
+        self.callback = callback
+    }
+    
     // MARK: Properties
 
     /// The event for this handler.
