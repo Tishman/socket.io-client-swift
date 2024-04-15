@@ -172,7 +172,7 @@ public enum SocketIOClientOption : ClientOption {
         return description
     }
 
-    func getSocketIOOptionValue() -> Any {
+    public func getSocketIOOptionValue() -> Any {
         let value: Any
 
         switch self {
