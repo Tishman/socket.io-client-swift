@@ -237,6 +237,22 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
             handleClientEvent(.error, data: [event, items, error])
         }
     }
+    
+    open func emit(_ event: String, item: SocketData, completion: (() -> ())?) {
+        
+        do {
+            var data = [Any]()
+            data.append(event)
+            let socketData = try item.socketRepresentation()
+            data.append(socketData)
+            emit(data, completion: completion)
+        } catch {
+            DefaultSocketLogger.Logger.error("Error creating socketRepresentation for emit: \(event), \(item)",
+                                             type: logType)
+
+            handleClientEvent(.error, data: [event, item, error])
+        }
+    }
 
     /// Sends a message to the server, requesting an ack.
     ///
