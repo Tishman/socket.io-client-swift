@@ -95,6 +95,10 @@ public struct SocketIOClientConfiguration : ExpressibleByArrayLiteral, Collectio
     public init(arrayLiteral elements: Element...) {
         backingArray = elements
     }
+    
+    public init(array list: [Element]) {
+        backingArray = list
+    }
 
     // MARK: Methods
 
