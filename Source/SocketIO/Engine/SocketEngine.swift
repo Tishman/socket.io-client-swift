@@ -453,7 +453,11 @@ open class SocketEngine: NSObject, WebSocketDelegate, URLSessionDelegate,
             createWebSocketAndConnect()
         }
 
-        sendPing()
+        if version.rawValue >= 3 {
+            checkPings()
+        } else {
+            sendPing()
+        }
 
         if !forceWebsockets {
             doPoll()
