@@ -53,9 +53,6 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
 
     /// The array of handlers for this socket.
     public private(set) var handlers = [SocketEventHandler]()
-    
-    /// The queue for handlers array to avoid read/write condition
-    private let queue = DispatchQueue(label: "HandlerQueue", attributes: .concurrent)
 
     /// The manager for this socket.
     public private(set) weak var manager: SocketManagerSpec?
@@ -440,10 +437,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
     open func off(_ event: String) {
         DefaultSocketLogger.Logger.log("Removing handler for event: \(event)", type: logType)
         
-        queue.async(flags: .barrier) { [weak self] in
-            guard let self = self else { return }
-            self.handlers = self.handlers.filter({ $0.event != event })
-        }
+        handlers = self.handlers.filter({ $0.event != event })
     }
 
     /// Removes a handler with the specified UUID gotten from an `on` or `once`
@@ -454,10 +448,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
     open func off(id: UUID) {
         DefaultSocketLogger.Logger.log("Removing handler with id: \(id)", type: logType)
 
-        queue.async(flags: .barrier) { [weak self] in
-            guard let self = self else { return }
-            self.handlers = self.handlers.filter({ $0.id != id })
-        }
+        handlers = self.handlers.filter({ $0.id != id })
     }
 
     /// Adds a handler for an event.
@@ -470,9 +461,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
         DefaultSocketLogger.Logger.log("Adding handler for event: \(event)", type: logType)
 
         let handler = SocketEventHandler(event: event, id: UUID(), callback: callback)
-        queue.async(flags: .barrier) { [weak self] in
-            self?.handlers.append(handler)
-        }
+        handlers.append(handler)
 
         return handler.id
     }
@@ -522,9 +511,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
             callback(data, ack)
         }
         
-        queue.async(flags: .barrier) { [weak self] in
-            self?.handlers.append(handler)
-        }
+        handlers.append(handler)
 
         return handler.id
     }
@@ -544,9 +531,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
     ///
     /// Can be used after disconnecting to break any potential remaining retain cycles.
     open func removeAllHandlers() {
-        queue.async(flags: .barrier) { [weak self] in
-            self?.handlers.removeAll(keepingCapacity: false)
-        }
+            handlers.removeAll(keepingCapacity: false)
     }
 
     /// Puts the socket back into the connecting state.
