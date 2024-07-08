@@ -365,7 +365,7 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
 
         anyHandler?(SocketAnyEvent(event: event, items: data))
         
-        manager?.handleQueue.async { [weak self] in
+        queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             for handler in self.handlers where handler.event == event {
                 handler.executeCallback(with: data, withAck: ack, withSocket: self)
