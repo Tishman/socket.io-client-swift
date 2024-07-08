@@ -364,9 +364,12 @@ open class SocketIOClient: NSObject, SocketIOClientSpec {
         DefaultSocketLogger.Logger.log("Handling event: \(event) with data: \(data)", type: logType)
 
         anyHandler?(SocketAnyEvent(event: event, items: data))
-
-        for handler in handlers where handler.event == event {
-            handler.executeCallback(with: data, withAck: ack, withSocket: self)
+        
+        manager?.handleQueue.async { [weak self] in
+            guard let self = self else { return }
+            for handler in self.handlers where handler.event == event {
+                handler.executeCallback(with: data, withAck: ack, withSocket: self)
+            }
         }
     }
 
